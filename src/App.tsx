@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { MetricsGrid } from "@/components/dashboard/metrics-grid"
+import { ChartsSection } from "@/components/dashboard/charts-section"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,7 +10,7 @@ import {
   Download,
   Sparkles,
   TrendingUp,
-  ArrowRight,
+  BarChart2,
   CheckCircle2,
   RefreshCw,
 } from "lucide-react"
@@ -75,7 +76,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* 4 Metric Summary Cards Section (Phase 3) */}
+      {/* 4 Metric Summary Cards (Phase 3) */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
@@ -87,44 +88,52 @@ export default function App() {
         <MetricsGrid />
       </section>
 
-      {/* Phase 3 Completion Overview */}
+      {/* Charts & Visualizations (Phase 4) */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
+            <BarChart2 className="h-4 w-4 text-primary" />
+            Financial & Operational Trends
+          </h2>
+          <span className="text-xs text-muted-foreground">Interactive analytics</span>
+        </div>
+        <ChartsSection />
+      </section>
+
+      {/* Phase 4 Completion Status */}
       <Card className="border shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-2 text-primary font-medium text-sm">
             <Sparkles className="h-4 w-4" />
-            <span>Phase 3 Completed</span>
+            <span>Phase 4 Completed</span>
           </div>
           <CardTitle className="text-xl sm:text-2xl font-bold">
-            Metric Summary Cards Deployed
+            Data Visualizations & Charts Deployed
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
-            The metric cards display high-impact KPIs with custom icons, color accents,
-            growth percentages, contextual comparisons, and live pulsing activity indicators.
+            Added Bar, Donut/Pie, and Spline Area charts styled harmoniously with Shadcn theme tokens,
+            custom tooltips, interactive filters, and responsive viewports.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
             <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Total Revenue with dollar icon & positive growth</span>
+              <span>Revenue Bar Chart with metric toggles & tooltips</span>
             </div>
             <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Subscriptions & user count with growth rates</span>
+              <span>Channel Acquisition Donut Chart with live legend</span>
             </div>
             <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Sales Orders with credit card icon & trend badge</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Active Now counter with real-time pulsing live badge</span>
+              <span>Session & Conversion Spline Line/Area Chart</span>
             </div>
           </div>
 
           <div className="pt-2 flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
-              Up Next: <strong>Phase 4 — Data Visualizations & Charts</strong> (Revenue Overview Chart & Sales Analytics)
+              Up Next: <strong>Phase 5 — Interactive Data Table</strong> (Recent Transactions & Users with sorting, filtering, and pagination)
             </p>
           </div>
         </CardContent>
