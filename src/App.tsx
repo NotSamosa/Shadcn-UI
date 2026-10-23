@@ -1,23 +1,28 @@
 import React, { useState } from "react"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
+import { MetricsGrid } from "@/components/dashboard/metrics-grid"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
-  CheckCircle2,
-  Layers,
-  ArrowRight,
-  Sidebar as SidebarIcon,
-  Search,
-  Bell,
-  Smartphone,
-  Sliders,
+  Calendar,
+  Download,
   Sparkles,
+  TrendingUp,
+  ArrowRight,
+  CheckCircle2,
+  RefreshCw,
 } from "lucide-react"
 
 export default function App() {
   const [currentView, setCurrentView] = useState("overview")
   const [searchQuery, setSearchQuery] = useState("")
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  const handleRefresh = () => {
+    setIsRefreshing(true)
+    setTimeout(() => setIsRefreshing(false), 800)
+  }
 
   return (
     <DashboardLayout
@@ -26,7 +31,7 @@ export default function App() {
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
     >
-      {/* Header Banner */}
+      {/* Dashboard Top Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
         <div>
           <div className="flex items-center gap-2">
@@ -35,7 +40,7 @@ export default function App() {
             </h1>
             <Badge variant="success" className="gap-1.5 py-0.5">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Live Workspace
+              Live Feed
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
@@ -43,98 +48,83 @@ export default function App() {
           </p>
         </div>
 
+        {/* Action Controls */}
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs px-2.5 py-1">
-            Active View: <strong className="ml-1 text-foreground capitalize">{currentView}</strong>
-          </Badge>
-          {searchQuery && (
-            <Badge variant="secondary" className="text-xs">
-              Filtering: "{searchQuery}"
-            </Badge>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            className="h-9 gap-1.5 text-xs"
+            disabled={isRefreshing}
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-primary" : ""}`}
+            />
+            <span>Refresh</span>
+          </Button>
+
+          <Button variant="outline" size="sm" className="h-9 gap-1.5 text-xs hidden sm:flex">
+            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+            <span>Jan 20 – Feb 20, 2026</span>
+          </Button>
+
+          <Button size="sm" className="h-9 gap-1.5 text-xs shadow-sm shadow-primary/20">
+            <Download className="h-3.5 w-3.5" />
+            <span>Download</span>
+          </Button>
         </div>
       </div>
 
-      {/* Shell Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="hover:border-primary/50 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Collapsible Sidebar</CardTitle>
-            <SidebarIcon className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Fixed & Reactive</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Collapses smoothly to 80px on desktop with tooltips and badge indicators.
-            </p>
-          </CardContent>
-        </Card>
+      {/* 4 Metric Summary Cards Section (Phase 3) */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            Key Performance Metrics
+          </h2>
+          <span className="text-xs text-muted-foreground">Updated 2 minutes ago</span>
+        </div>
+        <MetricsGrid />
+      </section>
 
-        <Card className="hover:border-primary/50 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Mobile Drawer Navigation</CardTitle>
-            <Smartphone className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Sheet Slide-in</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Full slide-out drawer on tablets & mobile screens with backdrop blur.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:border-primary/50 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Top Controls & Menus</CardTitle>
-            <Sliders className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Search & Profile</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Global search bar, unread notification alerts, theme toggle, and account menu.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Phase 2 Progress Card */}
+      {/* Phase 3 Completion Overview */}
       <Card className="border shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-2 text-primary font-medium text-sm">
             <Sparkles className="h-4 w-4" />
-            <span>Phase 2 Completed</span>
+            <span>Phase 3 Completed</span>
           </div>
           <CardTitle className="text-xl sm:text-2xl font-bold">
-            Responsive Shell Layout Implemented
+            Metric Summary Cards Deployed
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
-            The shell architecture provides a fixed sidebar, independent main content scrolling,
-            full responsiveness on mobile screens, and synchronized navigation state.
+            The metric cards display high-impact KPIs with custom icons, color accents,
+            growth percentages, contextual comparisons, and live pulsing activity indicators.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Independent scroll container for main view</span>
+              <span>Total Revenue with dollar icon & positive growth</span>
             </div>
             <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Collapsible desktop sidebar + mobile Sheet</span>
+              <span>Subscriptions & user count with growth rates</span>
             </div>
             <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>User profile card with status indicator</span>
+              <span>Sales Orders with credit card icon & trend badge</span>
             </div>
             <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Search bar, notifications dropdown, and theme switcher</span>
+              <span>Active Now counter with real-time pulsing live badge</span>
             </div>
           </div>
 
           <div className="pt-2 flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
-              Up Next: <strong>Phase 3 — Metric Summary Cards Section</strong> (Total Revenue, Subscriptions, Sales, Active Users)
+              Up Next: <strong>Phase 4 — Data Visualizations & Charts</strong> (Revenue Overview Chart & Sales Analytics)
             </p>
           </div>
         </CardContent>
