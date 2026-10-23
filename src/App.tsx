@@ -6,26 +6,27 @@ import { RecentTransactionsTable } from "@/components/dashboard/recent-transacti
 import { AnalyticsView } from "@/components/dashboard/analytics-view"
 import { ReportsView } from "@/components/dashboard/reports-view"
 import { NotificationsView } from "@/components/dashboard/notifications-view"
+import { CustomersView } from "@/components/dashboard/customers-view"
+import { SettingsView } from "@/components/dashboard/settings-view"
 import { DateRangePicker } from "@/components/dashboard/date-range-picker"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import {
   Download,
-  Sparkles,
   TrendingUp,
   BarChart2,
   Table as TableIcon,
-  CheckCircle2,
   RefreshCw,
   LayoutDashboard,
   BarChart3,
   FileText,
   Bell,
   Lock,
+  ShieldCheck,
+  Heart,
 } from "lucide-react"
 
 export default function App() {
@@ -33,7 +34,6 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  // Synchronize Tab change with sidebar currentView
   const handleTabChange = (value: string) => {
     setCurrentView(value)
   }
@@ -62,7 +62,7 @@ export default function App() {
     )
   }
 
-  // Map other sidebar items if clicked
+  // Active tab selection
   const tabValue = ["overview", "analytics", "reports", "notifications"].includes(currentView)
     ? currentView
     : "overview"
@@ -81,7 +81,13 @@ export default function App() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Operations & Analytics
+              {currentView === "settings"
+                ? "Workspace Settings"
+                : currentView === "customers"
+                ? "Client Directory"
+                : currentView === "sales"
+                ? "Sales & Fulfillment Ledger"
+                : "Operations & Analytics"}
             </h1>
             <Badge variant="success" className="gap-1.5 py-0.5">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -108,7 +114,7 @@ export default function App() {
             <span>Refresh</span>
           </Button>
 
-          {/* Interactive Date Range Filter */}
+          {/* Date Range Selector */}
           <DateRangePicker />
 
           <Button
@@ -122,127 +128,132 @@ export default function App() {
         </div>
       </div>
 
-      {/* Tabs Navigation (Phase 6) */}
-      <Tabs value={tabValue} onValueChange={handleTabChange} className="space-y-6">
-        <div className="flex items-center justify-between overflow-x-auto pb-1">
-          <TabsList className="h-10 p-1 bg-muted/60 border">
-            <TabsTrigger value="overview" className="gap-2 px-3 sm:px-4 text-xs sm:text-sm">
-              <LayoutDashboard className="h-4 w-4" />
-              <span>Overview</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2 px-3 sm:px-4 text-xs sm:text-sm">
-              <BarChart3 className="h-4 w-4" />
-              <span>Analytics</span>
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="gap-2 px-3 sm:px-4 text-xs sm:text-sm">
-              <FileText className="h-4 w-4" />
-              <span>Reports</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2 px-3 sm:px-4 text-xs sm:text-sm">
-              <Bell className="h-4 w-4" />
-              <span>Notifications</span>
-            </TabsTrigger>
-            {/* Disabled Tab to show completeness as required */}
-            <TabsTrigger value="integrations" disabled className="gap-1.5 px-3 text-xs sm:text-sm opacity-50 cursor-not-allowed">
-              <Lock className="h-3 w-3" />
-              <span>AI Forecasts (Pro)</span>
-            </TabsTrigger>
-          </TabsList>
+      {/* View Router */}
+      {currentView === "customers" ? (
+        <CustomersView />
+      ) : currentView === "settings" ? (
+        <SettingsView />
+      ) : currentView === "sales" ? (
+        <div className="space-y-6">
+          <MetricsGrid />
+          <RecentTransactionsTable />
+        </div>
+      ) : (
+        /* Tabs View (Overview, Analytics, Reports, Notifications) */
+        <Tabs value={tabValue} onValueChange={handleTabChange} className="space-y-6">
+          <div className="flex items-center justify-between overflow-x-auto pb-1">
+            <TabsList className="h-10 p-1 bg-muted/60 border">
+              <TabsTrigger value="overview" className="gap-2 px-3 sm:px-4 text-xs sm:text-sm">
+                <LayoutDashboard className="h-4 w-4" />
+                <span>Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="gap-2 px-3 sm:px-4 text-xs sm:text-sm">
+                <BarChart3 className="h-4 w-4" />
+                <span>Analytics</span>
+              </TabsTrigger>
+              <TabsTrigger value="reports" className="gap-2 px-3 sm:px-4 text-xs sm:text-sm">
+                <FileText className="h-4 w-4" />
+                <span>Reports</span>
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="gap-2 px-3 sm:px-4 text-xs sm:text-sm">
+                <Bell className="h-4 w-4" />
+                <span>Notifications</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="integrations"
+                disabled
+                className="gap-1.5 px-3 text-xs sm:text-sm opacity-50 cursor-not-allowed"
+              >
+                <Lock className="h-3 w-3" />
+                <span>AI Forecasts (Pro)</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Overview Tab Content */}
+          <TabsContent value="overview" className="space-y-8 mt-0">
+            {/* Metric Summary Cards Section */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  Key Performance Metrics
+                </h2>
+                <span className="text-xs text-muted-foreground">Updated in real-time</span>
+              </div>
+              <MetricsGrid />
+            </section>
+
+            {/* Charts Visualizations Section */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
+                  <BarChart2 className="h-4 w-4 text-primary" />
+                  Financial & Operational Trends
+                </h2>
+                <span className="text-xs text-muted-foreground">Multi-series comparisons</span>
+              </div>
+              <ChartsSection />
+            </section>
+
+            {/* Interactive Data Table Section */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
+                  <TableIcon className="h-4 w-4 text-primary" />
+                  Live Transactions & Ledger
+                </h2>
+                <span className="text-xs text-muted-foreground">Searchable & Paginated</span>
+              </div>
+              <RecentTransactionsTable />
+            </section>
+          </TabsContent>
+
+          {/* Analytics Tab Content */}
+          <TabsContent value="analytics" className="mt-0">
+            <AnalyticsView />
+          </TabsContent>
+
+          {/* Reports Tab Content */}
+          <TabsContent value="reports" className="mt-0">
+            <ReportsView />
+          </TabsContent>
+
+          {/* Notifications Tab Content */}
+          <TabsContent value="notifications" className="mt-0">
+            <NotificationsView />
+          </TabsContent>
+        </Tabs>
+      )}
+
+      {/* Polished Executive Footer */}
+      <footer className="pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-medium text-foreground">NexusOps Platform</span>
+          <span>•</span>
+          <span>v2.4.1 Production</span>
+          <span>•</span>
+          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            SOC2 Certified
+          </span>
         </div>
 
-        {/* Tab 1: Overview */}
-        <TabsContent value="overview" className="space-y-8 mt-0">
-          {/* 4 Metric Summary Cards */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                Key Performance Metrics
-              </h2>
-              <span className="text-xs text-muted-foreground">Updated in real-time</span>
-            </div>
-            <MetricsGrid />
-          </section>
-
-          {/* Charts Section */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
-                <BarChart2 className="h-4 w-4 text-primary" />
-                Financial & Operational Trends
-              </h2>
-              <span className="text-xs text-muted-foreground">Multi-series comparisons</span>
-            </div>
-            <ChartsSection />
-          </section>
-
-          {/* Data Table */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
-                <TableIcon className="h-4 w-4 text-primary" />
-                Live Transactions & Ledger
-              </h2>
-              <span className="text-xs text-muted-foreground">Searchable & Paginated</span>
-            </div>
-            <RecentTransactionsTable />
-          </section>
-        </TabsContent>
-
-        {/* Tab 2: Analytics */}
-        <TabsContent value="analytics" className="mt-0">
-          <AnalyticsView />
-        </TabsContent>
-
-        {/* Tab 3: Reports */}
-        <TabsContent value="reports" className="mt-0">
-          <ReportsView />
-        </TabsContent>
-
-        {/* Tab 4: Notifications */}
-        <TabsContent value="notifications" className="mt-0">
-          <NotificationsView />
-        </TabsContent>
-      </Tabs>
-
-      {/* Phase 6 Completion Status Card */}
-      <Card className="border shadow-sm">
-        <CardHeader>
-          <div className="flex items-center gap-2 text-primary font-medium text-sm">
-            <Sparkles className="h-4 w-4" />
-            <span>Phase 6 Completed</span>
-          </div>
-          <CardTitle className="text-xl sm:text-2xl font-bold">
-            Navigation Tabs, Views & Toast Feedback Active
-          </CardTitle>
-          <CardDescription className="text-sm text-muted-foreground">
-            Integrated Shadcn Tabs for Overview, Analytics, Reports, Notifications, and disabled Pro tabs,
-            complete with sonner toast notifications for exports, data refresh, and date range filters.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-            <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Multi-view Tabs with smooth content transitions</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Interactive DateRangePicker with period presets</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-              <span>Interactive Sonner toast alerts for downloads & syncs</span>
-            </div>
-          </div>
-
-          <div className="pt-2 flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
-              Up Next: <strong>Phase 7 — Final Polish, Mobile Responsiveness & Review</strong>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+        <div className="flex items-center gap-4">
+          <a href="#help" onClick={(e) => { e.preventDefault(); toast.info("Documentation portal is active"); }} className="hover:text-foreground transition-colors">
+            Documentation
+          </a>
+          <span>•</span>
+          <a href="#api" onClick={(e) => { e.preventDefault(); toast.info("API Reference v2"); }} className="hover:text-foreground transition-colors">
+            API Reference
+          </a>
+          <span>•</span>
+          <a href="#status" onClick={(e) => { e.preventDefault(); toast.success("All systems operating normally (99.99%)"); }} className="hover:text-foreground transition-colors">
+            System Status
+          </a>
+        </div>
+      </footer>
     </DashboardLayout>
   )
 }
